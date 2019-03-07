@@ -11,30 +11,36 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  restoreBuildProject: '**/*.csproj'
+  testProject: '**/*Tests/*.csproj'
 
 steps:
 - task: DotNetCoreCLI@2
   displayName: Restore
   inputs:
     command: restore
-    projects: '$(Parameters.RestoreBuildProjects)'
+    projects: '$(restoreBuildProject)'
+
 - task: DotNetCoreCLI@2
   displayName: Build
   inputs:
-    projects: '$(Parameters.RestoreBuildProjects)'
-    arguments: '--configuration $(BuildConfiguration)'
+    projects: '$(restoreBuildProject)'
+    arguments: '--configuration $(buildConfiguration)'
+
 - task: DotNetCoreCLI@2
   displayName: Test
   inputs:
     command: test
-    projects: '$(Parameters.TestProjects)'
-    arguments: '--configuration $(BuildConfiguration)'
+    projects: '$(testProject)'
+    arguments: '--configuration $(buildConfiguration)'
+
 - task: DotNetCoreCLI@2
   displayName: Publish
   inputs:
     command: publish
     publishWebProjects: True
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
